@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uleam Encuestas - Principal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../CSS/Proyecto_Pagina_Principal.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        [v-cloak] { display: none; }
+    </style>
+</head>
+<body>
+    <div id="app" v-cloak>
+        <aside class="barra_lateral" :style="{ backgroundColor: sidebarColor }">
+            <div class="barra_lateral-marca">
+                <img src="LOGO-ULEAM.png" alt="Logo Uleam">
+                <div class="fuente-bevan">ENCUESTADOS</div>
+            </div>
+
+            <div class="user-profile">
+                <div class="avatar-circle">{{ usuarioActual.inicial }}</div>
+                <p class="user-name">{{ usuarioActual.nombre }}</p>
+                <span class="user-role-badge">{{ usuarioActual.rol }}</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="Proyecto_crear_encuestas.html" class="nav-item">
+                    <i class="fas fa-plus-circle"></i> Crear Encuesta
+                </a>
+                <a href="Proyecto_responder_encuestas.html" class="nav-item">
+                    <i class="far fa-edit"></i> Responder Encuesta
+                </a>
+                <a href="#" @click.prevent="cerrarSesion" class="nav-item logout">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div>
+                    <h1>Mis Encuestas</h1>
+                    <p class="text-muted">{{ fechaActual }}</p>
+                </div>
+                <div class="header-info">
+                    <h1 class="saludo-principal">¡Hola de nuevo, {{ usuarioActual.nombre.split(' ')[0] }}!</h1>
+                    <p class="subtitulo-header">tu plataforma para encuestas de confianza</p>
+                </div>
+            </header>
+
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="avatar-circle" style="background: #e8f5e9; color: #2e7d32;">
+                        <i class="fas fa-poll"></i>
+                    </div>
+                    <div>
+                        <span class="stat-val">{{ misEncuestas.length }}</span>
+                        <p>Tus Encuestas</p>
+                    </div>
+                </div>
+            </div>
+
+            <div v-for="encuesta in misEncuestas" :key="encuesta.id" class="encuesta-card">
+                <div class="encuesta-header">
+                    <div>
+                        <span :class="['status-pill', (encuesta.estado || 'Activa').toLowerCase()]">
+                            {{ encuesta.estado || 'Activa' }}
+                        </span>
+                        <h2>{{ encuesta.titulo }}</h2>
+                        <p>{{ encuesta.descripcion }}</p>
+                    </div>
+                    <button @click="toggleDetalles(encuesta.id)" class="btn-black">
+                        {{ encuestaAbiertaId === encuesta.id ? 'Cerrar Análisis' : 'Ver Análisis' }}
+                    </button>
+                </div>
+
+                <div v-if="encuestaAbiertaId === encuesta.id" class="stats-panel">
+                    <div class="stats-row">
+                        <div class="stat-box">
+                            <span class="stat-val blue-text">{{ encuesta.totalVotos || 0 }}</span>
+                            <p>Total Respuestas</p>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-val">{{ encuesta.duracion || 0 }} min</span>
+                            <p>Duración Promedio</p>
+                        </div>
+                        <div class="card-acciones">
+                            <button class="btn-eliminar-rojo" @click="eliminarMiEncuesta(encuesta.id)">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
+
+                    <hr class="divider">
+
+                    <div v-for="pregunta in encuesta.preguntas" :key="pregunta.id" class="preg-stat-block">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h3>{{ pregunta.texto }}</h3>
+                            <button @click="verMasDetalles(pregunta)" class="btn-detalles-tabla">
+                                <i class="fas fa-list-ul"></i> Más detalles
+                            </button>
+                        </div>
+                        
+                        <div v-for="opcion in pregunta.opciones" :key="typeof opcion === 'object' ? opcion.texto : opcion" class="opcion-stat">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 10px;">
+                                <span>{{ typeof opcion === 'object' ? opcion.texto : opcion }}</span>
+                                <span>{{ calcularPorcentaje(opcion.votos || 0, encuesta.totalVotos || 0) }}% ({{ opcion.votos || 0 }} votos)</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" :style="{ width: calcularPorcentaje(opcion.votos || 0, encuesta.totalVotos || 0) + '%' }"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div v-if="mostrarModalDetalles" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Resultados Individuales: {{ preguntaSeleccionada.texto }}</h3>
+                    <button @click="cerrarModal" class="btn-close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p class="resumen-votos">{{ preguntaSeleccionada.respuestasDetalle ? preguntaSeleccionada.respuestasDetalle.length : 0 }} Respuestas totales</p>
+                    <table class="tabla-detalles">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre del Participante</th>
+                                <th>Opción Elegida</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(resp, idx) in preguntaSeleccionada.respuestasDetalle" :key="idx">
+                                <td>{{ idx + 1 }}</td>
+                                <td class="nombre-tabla">{{ resp.nombreUsuario }}</td>
+                                <td><span class="badge-respuesta">{{ resp.opcionElegida }}</span></td>
+                            </tr>
+                            <tr v-if="!preguntaSeleccionada.respuestasDetalle || preguntaSeleccionada.respuestasDetalle.length === 0">
+                                <td colspan="3" style="text-align: center; padding: 20px;">No hay respuestas registradas aún.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../src/js/core/db.js"></script>
+    <script src="../src/js/views/principal.js"></script>
+</body>
+</html>

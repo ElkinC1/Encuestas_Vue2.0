@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>ENCUESTADOS - ULEAM</title>
+    <link rel="stylesheet" href="../CSS/Proyecto_crear_encuestas.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div id="app" v-cloak>
+        <nav class="top-nav">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <img src="LOGO-ULEAM.png" class="nav-logo">
+                    <div class="nav-divider"></div>
+                    <span class="nav-title">ENCUESTADOS</span>
+                </div>
+                <div class="nav-user">
+                    <i class="fas fa-user-circle"></i> <span>{{ usuarioActual.nombre }}</span>
+                </div>
+            </div>
+        </nav>
+
+        <div class="forms-wrapper" :style="{ backgroundColor: fondoColor }">
+            <div class="forms-container">
+                
+                <header class="forms-card header-card">
+                    <div class="forms-padding-large">
+                        <input type="text" v-model="titulo" placeholder="Título de la encuesta" class="main-title-input">
+                        <textarea v-model="descripcion" placeholder="Descripción de la encuesta" class="main-desc-input"></textarea>
+                    </div>
+                </header>
+
+                <div v-for="(p, i) in preguntas" :key="p.id" class="forms-card question-card">
+                    <div class="forms-padding-large">
+                        <div class="q-header-row">
+                            <input type="text" v-model="p.texto" :placeholder="'Pregunta ' + (i+1)" class="q-text-input">
+                            <select v-model="p.tipo" class="q-type-select">
+                                <option value="radio">🔘 Opción única</option>
+                                <option value="checkbox">☑️ Casillas</option>
+                                <option value="texto">📝 Texto libre</option>
+                            </select>
+                        </div>
+
+                        <div class="q-body-content">
+                            <div v-if="p.tipo !== 'texto'" class="options-container">
+                                <div v-for="(opt, oI) in p.opciones" :key="oI" class="opt-row">
+                                    <i :class="p.tipo === 'radio' ? 'far fa-circle' : 'far fa-check-square'"></i>
+                                    <input type="text" v-model="p.opciones[oI]" class="opt-text-input">
+                                    <button @click="eliminarOpcion(i, oI)" v-if="p.opciones.length > 1" class="btn-remove-opt">×</button>
+                                </div>
+                                <button class="btn-add-opt" @click="agregarOpcion(i)">Añadir opción</button>
+                            </div>
+                            <div v-else class="text-preview">
+                                <p>Texto de respuesta corta</p>
+                            </div>
+                        </div>
+
+                        <div class="q-card-footer">
+                            <button class="btn-action-icon" @click="eliminarPregunta(i)"><i class="far fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="privacy-config-area" v-if="privacidad.tipo !== 'todos'">
+                    <div class="forms-card privacy-card">
+                        <div class="forms-padding-large">
+                            <h4 v-if="privacidad.tipo === 'rol'"><i class="fas fa-users"></i> Roles Permitidos</h4>
+                            <h4 v-if="privacidad.tipo === 'especifico'"><i class="fas fa-envelope"></i> Correos Autorizados</h4>
+                            
+                            <div v-if="privacidad.tipo === 'rol'" class="roles-grid">
+                                <label v-for="rol in ['ESTUDIANTE', 'PROFESOR', 'ADMINISTRADOR']" class="rol-pill">
+                                    <input type="checkbox" :value="rol" v-model="privacidad.roles">
+                                    {{ rol }}
+                                </label>
+                            </div>
+
+                            <div v-if="privacidad.tipo === 'especifico'" class="email-box">
+                                <textarea v-model="privacidad.correos" placeholder="ejemplo@live.uleam.edu.ec, otro@uleam.edu.ec" class="q-text-input"></textarea>
+                                <small>Separa los correos con una coma (,)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="forms-toolbar">
+                    <div class="tool-group">
+                        <button @click="agregarPregunta('radio')"><i class="fas fa-dot-circle"></i></button>
+                        <button @click="agregarPregunta('checkbox')"><i class="fas fa-check-square"></i></button>
+                        <button @click="agregarPregunta('texto')"><i class="fas fa-align-left"></i></button>
+                    </div>
+                    <div class="tool-divider"></div>
+                    <div class="tool-group">
+                        <select v-model="privacidad.tipo" class="privacy-select">
+                            <option value="todos">🌍 Público</option>
+                            <option value="rol">👥 Roles</option>
+                            <option value="especifico">✉️ Correo</option>
+                        </select>
+                        <input type="color" v-model="fondoColor" class="color-dot">
+                        <button class="btn-publish-final" @click="guardarEncuesta">Publicar</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../src/js/core/db.js"></script>
+    <script src="../src/js/views/crear-encuestas.js"></script>
+</body>
+</html>

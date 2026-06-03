@@ -1,0 +1,25 @@
+body { background: #ffffff !important; font-family: 'Roboto', sans-serif; margin: 0; padding: 0; }
+[v-cloak] { display: none; }
+.nav-container { width: 94%; max-width: 1050px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+.nav-brand { display: flex; align-items: center; gap: 12px; }
+.nav-logo { height: 40px; }
+.nav-divider { width: 1px; height: 28px; background: #90ace3; }
+.nav-title { font-size: 20px; color: #5f6368; letter-spacing: 0.5px; font-family: 'Bevan', cursive; }
+.nav-user { display: flex; align-items: center; gap: 8px; color: #5f6368; }
+.page-background { width: 100%; padding: 80px 0; display: flex; justify-content: center; }
+.response-container { width: 90%; max-width: 770px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px; transition: all 0.4s ease; border-top: 10px solid #1a4d2e; }
+.response-header { border-bottom: 1px solid #ddd; padding-bottom: 20px; margin-bottom: 20px; text-align: center; position: relative; }
+.response-header h1 { font-size: 24px; color: #202124; margin: 0; }
+.btn-back { position: absolute; left: 0; top: 5px; background: none; border: none; color: #5f6368; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 5px; }
+.descripcion-responder { color: #5f6368; margin-bottom: 25px; font-size: 15px; }
+.pregunta-responder-card { border: 1px solid #dadce0; padding: 24px; margin-bottom: 20px; border-radius: 8px; }
+.pregunta-responder-card h3 { font-size: 16px; margin: 0 0 15px 0; font-weight: 500; }
+.opcion-label { display: flex; align-items: center; gap: 10px; padding: 8px 0; cursor: pointer; font-size: 14px; }
+textarea { width: 100%; padding: 12px; border: 1px solid #dadce0; border-radius: 4px; resize: vertical; min-height: 80px; }
+.btn-submit-response { width: 100%; padding: 12px; background: #1a4d2e; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+.btn-submit-response:hover { background: #143d24; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+.pendiente-card { border: 1px solid #dadce0; padding: 20px; margin-bottom: 12px; border-radius: 8px; cursor: pointer; transition: 0.2s; border-left: 5px solid #1a4d2e; }
+.pendiente-card:hover { background: #f8f9fa; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+.btn-seleccionar { color: #1a73e8; font-weight: 500; font-size: 13px; margin-top: 10px; display: block; }
+.no-data { text-align: center; padding: 40px; color: #5f6368; }
+.no-data i { font-size: 50px; color: #1a4d2e; margin-bottom: 15px; }

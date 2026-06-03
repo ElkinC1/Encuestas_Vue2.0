@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Responder Encuesta - ULEAM</title>
+    <link rel="stylesheet" href="../CSS/Proyecto_responder_Encuestas.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div id="app" v-cloak>
+        <nav class="top-nav">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <img src="LOGO-ULEAM.png" class="nav-logo">
+                    <div class="nav-divider"></div>
+                    <span class="nav-title">ENCUESTADOS</span>
+                </div>
+                <div class="nav-user">
+                    <i class="fas fa-user-circle"></i> <span>{{ usuarioActual.nombre }}</span>
+                </div>
+            </div>
+        </nav>
+        <div class="page-background">
+            <div class="response-container" :style="{ borderTop: '10px solid ' + (encuestaSeleccionada ? encuestaSeleccionada.colorTema : '#1a4d2e'), backgroundColor: encuestaSeleccionada ? encuestaSeleccionada.colorTema + '10' : 'white' }">
+                
+                <header class="response-header">
+                    <button class="btn-back" @click="volver">
+                        <i class="fas fa-arrow-left"></i> {{ encuestaSeleccionada ? 'Cancelar' : 'Volver' }}
+                    </button>
+                    <h1>{{ encuestaSeleccionada ? encuestaSeleccionada.titulo : 'Encuestas Pendientes' }}</h1>
+                </header>
+
+                <div v-if="!encuestaSeleccionada">
+                    <div v-for="encuesta in encuestas" :key="encuesta.id" class="pendiente-card" @click="seleccionarEncuesta(encuesta)">
+                        <div class="info">
+                            <h4>{{ encuesta.titulo }}</h4>
+                            <p>{{ encuesta.descripcion }}</p>
+                            <span class="btn-seleccionar">Responder ahora <i class="fas fa-edit"></i></span>
+                        </div>
+                    </div>
+                    <div v-if="encuestas.length === 0" class="no-data">
+                        <i class="fas fa-check-circle"></i>
+                        <p>No tienes encuestas pendientes por responder.</p>
+                    </div>
+                </div>
+
+                <form v-else @submit.prevent="enviarRespuestas">
+                    <p class="descripcion-responder">{{ encuestaSeleccionada.descripcion }}</p>
+                    
+                    <div v-for="(p, index) in encuestaSeleccionada.preguntas" :key="p.id" class="pregunta-responder-card">
+                        <h3>{{ index + 1 }}. {{ p.texto }}</h3>
+
+                        <div class="pregunta-inputs">
+                            <div v-if="p.tipo === 'radio'">
+                                <label v-for="opt in p.opciones" class="opcion-label">
+                                    <input type="radio" :name="'q'+p.id" :value="opt.texto" v-model="respuestasMap[p.id]" required>
+                                    {{ opt.texto }}
+                                </label>
+                            </div>
+
+                            <div v-if="p.tipo === 'checkbox'">
+                                <label v-for="opt in p.opciones" class="opcion-label">
+                                    <input type="checkbox" :value="opt.texto" v-model="respuestasMap[p.id]">
+                                    {{ opt.texto }}
+                                </label>
+                            </div>
+
+                            <div v-if="p.tipo === 'texto'">
+                                <textarea v-model="respuestasMap[p.id]" placeholder="Tu respuesta aquí..." required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit-response">Finalizar y Enviar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../src/js/core/db.js"></script>
+    <script src="../src/js/views/responder-encuestas.js"></script>
+</body>
+</html>
