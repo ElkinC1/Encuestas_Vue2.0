@@ -331,7 +331,37 @@ async function dbVerificarCodigoYCambiarClave(correoPrincipal, codigoIngresado, 
         return { ok: false, mensaje: 'Error al cambiar clave.' };
     }
 }
+window.dbReenviarCodigoActivacion = async function(correo) {
+    try {
+        // 1. Buscar usuario por correo y estado 'inactivo'
+        const { data: usuario, error } = await supabase
+            .from('usuarios')
+            .select('*')
+            .eq('correo', correo)
+            .eq('estado', 'inactivo') // Asegúrate de que tu columna se llame 'estado'
+            .single();
 
+        if (error || !usuario) return { ok: false, mensaje: "Cuenta no encontrada o ya está activa." };
+
+        // 2. Generar nuevo código
+        const nuevoCodigo = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        // 3. Actualizar en la base de datos
+        const { error: errorUpdate } = await supabase
+            .from('usuarios')
+            .update({ 
+                codigo_verificacion: nuevoCodigo,
+                codigo_expiracion: new Date(Date.now() + 15 * 60000) // 15 minutos más
+            })
+            .eq('correo', correo);
+
+        if (errorUpdate) return { ok: false, mensaje: "Error al actualizar el código." };
+
+        return { ok: true, datosEmail: { destino: correo, codigo: nuevoCodigo } };
+    } catch (e) {
+        return { ok: false, mensaje: "Error interno." };
+    }
+};
 async function dbObtenerEncuestas(usuarioActual) {
     try {
         const todas = await dbCargarDatosEncuestas();

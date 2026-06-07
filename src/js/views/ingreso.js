@@ -167,7 +167,30 @@ createApp({
                 alert(res.mensaje);
             }
         },
+        async reenviarCodigo() {
+            const correo = prompt("Ingresa tu correo institucional para reenviar el código:");
+            if (!correo) return;
 
+            this.cargando = true;
+            const res = await window.dbReenviarCodigoActivacion(correo);
+            this.cargando = false;
+
+            if (res.ok) {
+                try {
+                    await emailjs.send("service_37jwmic", "template_yj7j8f9", {
+                        destino: res.datosEmail.destino,
+                        codigo: res.datosEmail.codigo
+                    }, "k2m2Uuc6Utx23_CJ0");
+                    alert("Código reenviado. Revisa tu correo.");
+                    this.verificar.correo = correo;
+                    this.vistaActual = 'verificar';
+                } catch (e) {
+                    alert("Error al enviar el email.");
+                }
+            } else {
+                alert(res.mensaje);
+            }
+        },
         async procesarCambioClave() {
             const { correoPrincipal, codigoVerificacion, nuevaClave } = this.recuperar;
             this.cargando = true;

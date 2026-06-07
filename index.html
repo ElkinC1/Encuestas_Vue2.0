@@ -209,8 +209,16 @@
                 </button>
             </form>
         </div>
-
+        <footer class="footer-asistencia">
+    <p>
+            ¿Creaste tu cuenta pero no recibiste el código de activación? 
+            <a href="#" @click.prevent="reenviarCodigo()" class="link-asistencia">
+                Reenviar código de activación
+            </a>
+        </p>
+    </footer>
     </div>
+
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

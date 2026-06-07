@@ -286,3 +286,22 @@ body.modal-registro-abierto {
     border-top: 2px solid #ffc107;
     z-index: 99998;
 }
+.footer-asistencia {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #1a4d2e;
+    padding: 10px 0;
+    background: rgba(255, 255, 255, 0.4); 
+    z-index: 9999;
+    pointer-events: auto; 
+}
+
+.link-asistencia {
+    color: #0056b3;
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: bold;
+}
